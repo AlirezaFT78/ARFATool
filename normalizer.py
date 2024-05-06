@@ -15,12 +15,14 @@ class Normalizer:
         rem_punc: bool = False,
         rem_vow: bool = True,
         standard: bool = False,
+        half_space: bool = True,
         ) -> None:
         
         self.rem_punc = rem_punc
         self.rem_vow = rem_vow
         self.eng_num = eng_num
         self.standard = standard
+        self.half_space = half_space
         
         self.norm_dict = {"ء": "ئ"} 
         self.norm_dict.update(dict.fromkeys(['ﺁ','آ'],'آ'))
@@ -105,6 +107,7 @@ class Normalizer:
         self.standard_dict = self.standard_dict.union(set(self.punc_dict.keys()))
         self.standard_dict = self.standard_dict.union(set(['\u200c']))
         
+        self.half_space_dict = {'می ': 'می\u200c', 'نمی ': 'نمی\u200c', ' ام': '\u200cام',' ای': '\u200cای',' ایم': '\u200cایم',' اید': '\u200cاید',' اند': '\u200cاند',}
         
         
     def remove_punctuation(self, txt):
@@ -151,6 +154,9 @@ class Normalizer:
         """
         mytable = str.maketrans(self.norm_dict)
         new_txt = txt.translate(mytable)
+        if self.half_space:
+            for key in self.half_space_dict:
+                new_txt = new_txt.replace(key,self.half_space_dict[key])
         new_txt = new_txt.replace('\u200c ', ' ')
         
         if self.rem_punc:
